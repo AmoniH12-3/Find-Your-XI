@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from google.cloud import bigquery
 
 
 # -------------------------
@@ -72,50 +73,25 @@ defensive_activity = st.slider(
 
 
 # -------------------------
-# Club data
+# BigQuery connection
 # -------------------------
 
-clubs = pd.DataFrame({
-    "team": [
-        "Man Utd",
-        "Arsenal",
-        "Liverpool",
-        "Bournemouth",
-        "Chelsea",
-        "Man City",
-        "Aston Villa",
-        "Brentford",
-        "Newcastle",
-        "Brighton"
-    ],
+client = bigquery.Client(project="find-your-xi")
 
-    "attacking": [
-        89.5, 94.7, 84.2, 73.7, 73.7,
-        100.0, 68.4, 63.2, 57.9, 52.6
-    ],
+query = """
+SELECT
+    team,
+    match_score,
+    attacking,
+    possession,
+    chance_creation,
+    defensive_performance,
+    defensive_activity
+FROM `find-your-xi.find_your_xi.club_match_reasons_clean`
+ORDER BY match_score DESC
+"""
 
-    "possession": [
-        63.2, 84.2, 94.7, 47.4, 89.5,
-        100.0, 73.7, 42.1, 68.4, 78.9
-    ],
-
-    "chance_creation": [
-        89.5, 84.2, 73.7, 78.9, 94.7,
-        100.0, 36.8, 68.4, 52.6, 57.9
-    ],
-
-    "defensive_performance": [
-        64.5, 52.6, 26.3, 56.6, 46.1,
-        56.6, 52.6, 56.6, 27.6, 63.2
-    ],
-
-    "defensive_activity": [
-        63.2, 15.8, 10.5, 73.7, 47.4,
-        14.0, 28.1, 56.1, 22.8, 49.1
-    ]
-})
-
-
+clubs = client.query(query).to_dataframe()
 # -------------------------
 # Recommendation
 # -------------------------
