@@ -92,6 +92,9 @@ ORDER BY match_score DESC
 """
 
 clubs = client.query(query).to_dataframe()
+
+
+
 # -------------------------
 # Recommendation
 # -------------------------
